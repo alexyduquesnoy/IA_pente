@@ -1,0 +1,15 @@
+{
+  "name": "ws_2_i4",
+  "version": "1.0.0",
+  "description": "Workshop 2 I4 Arras",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "http": "^0.0.0"
+  }
+}
