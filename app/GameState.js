@@ -17,7 +17,15 @@ let GameState = function() {
     this.lastMoveY = y;
     this.board[x][y] = playerNum;
     this.checkTenaille();
-    this.turn = +playerNum;
+    this.turn = playerNum === 1 ? 2 : 1;
+  }
+
+  this.getScore = function(playerNum) {
+    // TODO : add more critera
+    let points = this.nbTenaille[playerNum - 1] * 5;
+    points = (this.checkFinalState() === playerNum) * 25;
+
+    return points;
   }
 
   this.getEmptyCells = function() {

@@ -1,4 +1,5 @@
 var findRecursive = require('./utils').findRecursive;
+var searchHigherPositions = require('./utils').searchHigherPositions;
 var clone = require('clone');
 
 let IA = function(player, gameState) {
@@ -11,20 +12,22 @@ let IA = function(player, gameState) {
   }
 
   this.move = {
-    x: 0,
-    y: 0
+    x: parseInt(this.gameState.board.length / 2),
+    y: parseInt(this.gameState.board.length / 2)
   };
 
   // TODO : refactor le nom de la fonction
   this.run = function() {
     if(!findRecursive(this.gameState.board,1) && !findRecursive(this.gameState.board, 2)) {
-      let boardMiddle = parseInt(this.gameState.board.length / 2);
-      this.move.x = boardMiddle;
-      this.move.y = boardMiddle;
+      return;
     } else {
       this.getMovesPoints(this.gameState);
       // Here find the best move in this.movesPoints
       // And set this.move with that move
+      let bestPositions = searchHigherPositions(this.movesPoints);
+      let position = bestPositions[parseInt(Math.random() * this.gameState.board.length)];
+      this.move.x = position.x;
+      this.move.y = position.y;
     }
   };
 
@@ -35,8 +38,6 @@ let IA = function(player, gameState) {
       let y = emptyCells[i][1];
       this.movesPoints[x][y] = this.minmax(this.gameState, x, y);
     }
-
-    console.log(this.movesPoints);
   };
 
   this.minmax = function(currentGameState, x, y, points = 0) {
@@ -52,16 +53,6 @@ let IA = function(player, gameState) {
 
     return points;
   };
-
-  this.getScore = function(playerNum) {
-    // TODO : add more critera
-    let points = this.nbTenaille[playerNum - 1] * 5;
-    points = (this.checkFinalState() === playerNum) * 25;
-
-    return points;
-  };
-
-  this.countt
 };
 
 module.exports = IA;

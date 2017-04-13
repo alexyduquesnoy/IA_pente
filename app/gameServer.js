@@ -1,25 +1,26 @@
 var http = require('http');
+var clone = require('clone');
 
 var gameServer = {
   options : {
-    hostname : 'demo2604760.mockable.io',
-    port: 80,
-    path: '',
+    hostname : '172.20.10.4',
+    port: 3000,
+    path: '/api',
     method: 'GET'
   },
   webservices : {
     connect: function(args, callback) {
-      var options  = gameServer.options;
+      var options  = clone(gameServer.options);
       options.path += `/connect/${args.groupName}`;
       this.consume(options, callback);
     },
     play: function(args, callback) {
-      var options  = gameServer.options;
+      var options  = clone(gameServer.options);
       options.path += `/play/${x}/${y}/${idJoueur}`;
       this.consume(options, callback);
     },
     turn: function(args, callback) {
-      var options  = gameServer.options;
+      var options  = clone(gameServer.options);
       options.path += `/turn/${idJoueur}`;
       this.consume(options, callback);
     },

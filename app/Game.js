@@ -8,30 +8,32 @@ let Game = function(gameServer) {
   this.gameState = new GameState();
 
   this.start = function() {
-    gameServer.webservices.connect({groupName: this.player.name}, game.connect);
+    gameServer.webservices.connect({groupName: this.player.name}, this.connect);
   };
 
   this.connect = function(data) {
+    console.log(this.player);
     this.player.id = data.idJoueur;
     this.player.num = data.numJoueur;
 
-    gameServer.webservices.turn({idJoueur: this.player.id}, game.turn);
+    gameServer.webservices.turn({idJoueur: this.player.id}, this.turn);
   };
 
   this.play = function(data) {
     let ia = new IA(this.gameState);
-    ia.getBestMove();
-    ia.move.x;
+    ia.run();
+
+    gameServer.webservices.play({x: ia.move.x, y: ia.move.y, idJoueur: this.player.id}, this.turn);
   };
 
   this.turn = function(data) {
     this.update(data);
 
-    if(data.status == "1") {
+    if(parseInt(data.status) == 1) {
       this.play();
     } else {
       setTimeout(function() {
-        gameServer.webservices.turn({idJoueur: this.player.id}, game.turn);
+        gameServer.webservices.turn({idJoueur: this.player.id}, this.turn);
       }, 500);
     }
   };
