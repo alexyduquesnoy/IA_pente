@@ -22,8 +22,8 @@ let GameState = function() {
 
   this.getScore = function(playerNum) {
     // TODO : add more critera
-    let points = this.nbTenaille[playerNum - 1] * 5;
-    points += (this.checkFinalState() === playerNum) * 25;
+    let points = this.nbTenaille[playerNum - 1] * 75;
+    points += (this.checkFinalState() === playerNum) * 500;
 
     point += this.getPiecesInARowScore(playerNum, this.lastMoveX, this.lastMoveY);
 
