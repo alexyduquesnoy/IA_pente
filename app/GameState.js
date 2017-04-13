@@ -16,14 +16,16 @@ let GameState = function() {
     this.lastMoveX = x;
     this.lastMoveY = y;
     this.board[x][y] = playerNum;
-    this.checkTenaille();
+    this.nbTenaille[playerNum - 1] += this.checkTenailles(x, y);
     this.turn = playerNum === 1 ? 2 : 1;
   }
 
   this.getScore = function(playerNum) {
     // TODO : add more critera
     let points = this.nbTenaille[playerNum - 1] * 5;
-    points = (this.checkFinalState() === playerNum) * 25;
+    points += (this.checkFinalState() === playerNum) * 25;
+
+    point += this.getPiecesInARowScore(playerNum, this.lastMoveX, this.lastMoveY);
 
     return points;
   }
@@ -49,172 +51,120 @@ let GameState = function() {
       }
     }
 
-    for (let x = 0; x < this.board.length; x++) {
-      for (let y = 0; y < this.board[x].length; y++) {
-        if(B[x] && B[x][y] && B[x + 1] && B[x + 2] && B[x + 3]) {
-          if (
-            B[x][y] === B[x + 1][y] &&
-            B[x + 1][y] === B[x + 2][y] &&
-            B[x + 2][y] === B[x + 3][y] &&
-            B[x + 3][y] === B[x + 4][y]) {
-            return B[x][y];
-          }
-          if (
-            B[x][y] === B[x][y + 1] &&
-            B[x][y + 1] === B[x][y + 2] &&
-            B[x][y + 2] === B[x][y + 3] &&
-            B[x][y + 3] === B[x][y + 4]) {
-            return B[x][y];
-          }
-          if (
-            B[x][y] === B[x + 1][y + 1] &&
-            B[x + 1][y + 1] === B[x + 2][y + 2] &&
-            B[x + 2][y + 2] === B[x + 3][y + 3] &&
-            B[x + 3][y + 3] === B[x + 4][y + 4]) {
-            return B[x][y];
-          }
-          if (
-            B[x][y] === B[x + 1][y - 1] &&
-            B[x + 1][y - 1] === B[x + 2][y - 2] &&
-            B[x + 2][y - 2] === B[x + 3][y - 3] &&
-            B[x + 3][y - 3] === B[x + 4][y - 4]) {
-            return B[x][y];
-          }
+    for (var i = 0; i < B.length; i++) {
+      for (var j = 0; j < B[i].length; j++) {
+        if(
+          this.getNbPiecesInARow(1, i, j, 0, 1) === 5 ||
+          this.getNbPiecesInARow(1, i, j, 1, 1) === 5 ||
+          this.getNbPiecesInARow(1, i, j, 1, 0) === 5 ||
+          this.getNbPiecesInARow(1, i, j, 1, -1) === 5
+        ) {
+          return 1;
+        } else if (
+          this.getNbPiecesInARow(2, i, j, 0, 1) === 5 ||
+          this.getNbPiecesInARow(2, i, j, 1, 1) === 5 ||
+          this.getNbPiecesInARow(2, i, j, 1, 0) === 5 ||
+          this.getNbPiecesInARow(2, i, j, 1, -1) === 5
+        ) {
+          return 2;
         }
       }
     }
+
     return 0;
   };
 
+  this.checkTenaille = function(x, y, xD, yD) {
+    // xD  = xDirection
+    // yD = yDirection
 
-  // OPTIMIZE : trop de condition ! gérer ça avec deux directions peux (x : [-1, 1], y: [-1, 1]), divise le nombre de condition par 2 ou 4
-  this.checkTenaille = function () {
-    let i = this.lastMoveX;
-    let j = this.lastMoveY;
-    let B = this.board;
+    if((xD == 0 && yD == 0) || !this.board[x] || !this.board[x][y]) {
+      return false;
+    }
 
-    if(B[i] && B[i][j]) {
-      if (
-        B[i][j + 1] &&
-        B[i][j + 2] &&
-        B[i][j + 3] &&
-        B[i][j + 1] !== 0 &&
-        B[i][j] === B[i][j + 3] &&
-        B[i][j] !== B[i][j + 1] &&
-        B[i][j + 2] === B[i][j + 1]
+    for(let i = 0; i < 4; i++) {
+      if(
+        !this.board[x + (i * xD)] ||
+        !this.board[x + (i * xD)][y + (i * yD)]
       ) {
-        this.gameState.nbTenaille[B[i][j] - 1]++;
-        this.board[i][j + 1] = 0;
-        this.board[i][j + 2] = 0;
-      }
-      if (
-        B[i + 1] &&
-        B[i + 2] &&
-        B[i + 3] &&
-        B[i + 1][j] &&
-        B[i + 2][j] &&
-        B[i + 3][j] &&
-        B[i + 1][j] !== 0 &&
-        B[i][j] === B[i + 3][j] &&
-        B[i][j] !== B[i + 1][j] &&
-        B[i + 2][j] === B[i + 1][j]) {
-        this.gameState.nbTenaille[B[i][j] - 1]++;
-        this.board[i + 1][j] = 0;
-        this.board[i + 2][j] = 0;
-      }
-      if (
-        B[i + 1] &&
-        B[i + 2] &&
-        B[i + 3] &&
-        B[i + 1][j + 1] &&
-        B[i + 2][j + 2] &&
-        B[i + 3][j + 3] &&
-        B[i + 1][j + 1] !== 0 &&
-        B[i][j] === B[i + 3][j + 3] &&
-        B[i][j] !== B[i + 1][j + 1] &&
-        B[i + 2][j + 2] === B[i + 1][j + 1]
-      ) {
-        this.gameState.nbTenaille[B[i][j] - 1]++;
-        this.board[i + 1][j + 1] = 0;
-        this.board[i + 2][j + 2] = 0;
-      }
-      if (
-        B[i + 1] &&
-        B[i + 2] &&
-        B[i + 3] &&
-        B[i + 1][j - 1] &&
-        B[i + 2][j - 2] &&
-        B[i + 3][j - 3] &&
-        B[i + 1][j - 1] !== 0 &&
-        B[i][j] === B[i + 3][j - 3] &&
-        B[i][j] !== B[i + 1][j - 1] &&
-        B[i + 2][j - 2] === B[i + 1][j - 1]
-      ) {
-        this.gameState.nbTenaille[B[i][j] - 1]++;
-        this.board[i + 1][j - 1] = 0;
-        this.board[i + 2][j - 2] = 0;
-      }
-      if (
-        B[i][j - 1] &&
-        B[i][j - 2] &&
-        B[i][j - 3] &&
-        B[i][j - 1] !== 0 &&
-        B[i][j] === B[i][j - 3] &&
-        B[i][j] !== B[i][j - 1] &&
-        B[i][j - 2] === B[i][j - 1]
-      ) {
-        this.gameState.nbTenaille[B[i][j] - 1]++;
-        this.board[i][j - 1] = 0;
-        this.board[i][j - 2] = 0;
-      }
-      if (
-        B[i - 1] &&
-        B[i - 2] &&
-        B[i - 3] &&
-        B[i - 1][j] &&
-        B[i - 2][j] &&
-        B[i - 3][j] &&
-        B[i - 1][j] !== 0 &&
-        B[i][j] === B[i - 3][j] &&
-        B[i][j] !== B[i - 1][j] &&
-        B[i - 2][j] === B[i - 1][j]) {
-        this.gameState.nbTenaille[B[i][j] - 1]++;
-        this.board[i - 1][j] = 0;
-        this.board[i - 2][j] = 0;
-      }
-      if (
-        B[i - 1] &&
-        B[i - 2] &&
-        B[i - 3] &&
-        B[i - 1][j - 1] &&
-        B[i - 2][j - 2] &&
-        B[i - 3][j - 3] &&
-        B[i - 1][j - 1] !== 0 &&
-        B[i][j] === B[i - 3][j - 3] &&
-        B[i][j] !== B[i - 1][j - 1] &&
-        B[i - 2][j - 2] === B[i - 1][j - 1]
-      ) {
-        this.gameState.nbTenaille[B[i][j] - 1]++;
-        this.board[i - 1][j - 1] = 0;
-        this.board[i - 2][j - 2] = 0;
-      }
-      if (
-        B[i - 1] &&
-        B[i - 2] &&
-        B[i - 3] &&
-        B[i - 1][j + 1] &&
-        B[i - 2][j + 2] &&
-        B[i - 3][j + 3] &&
-        B[i - 1][j + 1] !== 0 &&
-        B[i][j] === B[i - 3][j + 3] &&
-        B[i][j] !== B[i - 1][j + 1] &&
-        B[i - 2][j + 2] === B[i - 1][j + 1]
-      ) {
-        this.gameState.nbTenaille[B[i][j] - 1]++;
-        this.board[i - 1][j + 1] = 0;
-        this.board[i - 2][j + 2] = 0;
+        return false;
       }
     }
+
+    if(
+      this.board[x][y] === this.board[x + (3 * xD)][y + (3 * yD)] &&
+      this.board[x][y] !== this.board[x + (1 * xD)][y + (1 * yD)] &&
+      this.board[x + (1 * xD)][y + (1 * yD)] === this.board[x + (2 * xD)][y + (2 * yD)]
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+
+  // OPTIMIZE : trop de condition ! gérer ça avec deux directions peux (x : [-1, 1], y: [-1, 1]), divise le nombre de condition par 2 ou 4
+  this.checkTenailles = function (x, y) {
+    for(let xDirection = -1; xDirection < 2; xDirection++) {
+      for(let yDirection = -1; yDirection < 2; yDirection++) {
+        if(this.checkTenaille(x, y, xDirection, yDirection)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
+  this.getNbPiecesInARow = function (value, x, y, xD, yD) {
+    // xD  = xDirection
+    // yD = yDirection
+
+    if(xD === 0 && yD === 0) {
+      return 0;
+    }
+
+    if(
+      this.board[x + (1 * xD)] &&
+      this.board[x + (1 * xD)][y + (1 * yD)] &&
+      this.board[x + (1 * xD)][y + (1 * yD)] === value
+    ) {
+      return 1 + this.getNbPiecesInARow(value, (x + (1 * xD)), (y + (1 * yD)), xD, yD);
+    }
+
+    return 0;
+  };
+
+  this.getPiecesInARow = function (value, x, y) {
+    let scoreMatrix = [];
+
+    // xD  = xDirection
+    // yD = yDirection
+    for(let xD = -1; xD < 2; xD++) {
+      for(let yD = -1; yD < 2; yD++) {
+        if(!scoreMatrix[xD + 1]) {
+          scoreMatrix[xD + 1] = [];
+        }
+        scoreMatrix[xD + 1][yD + 1] = this.getNbPiecesInARow(value, x, y, xD, yD);
+        if (scoreMatrix[xD + 1][yD + 1] > 0) console.log("X : " + x  + "; Y : " + y + "; Score : " + scoreMatrix[xD + 1][yD + 1]);
+      }
+    }
+
+    return scoreMatrix;
+  };
+
+  // Valeur maximum : 160
+  this.getPiecesInARowScore = function (value, x, y) {
+    let piecesInARow = this.getPiecesInARow(value, x, y);
+    let score = 0;
+
+    for(let i = 0; i < piecesInARow.length; i++) {
+      for(let j = 0; j < piecesInARow[i].length; j++) {
+        score += Math.exp(piecesInARow[i][j]);
+      }
+    }
+
+    return parseInt(score);
   };
 };
 

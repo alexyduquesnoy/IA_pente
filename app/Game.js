@@ -12,7 +12,7 @@ let Game = function(gameServer) {
   };
 
   this.connect = function(data) {
-    console.log(this.player);
+    // FIXME : this = requestResponse et pas Game !
     this.player.id = data.idJoueur;
     this.player.num = data.numJoueur;
 

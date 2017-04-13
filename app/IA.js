@@ -18,14 +18,17 @@ let IA = function(player, gameState) {
 
   // TODO : refactor le nom de la fonction
   this.run = function() {
-    if(!findRecursive(this.gameState.board,1) && !findRecursive(this.gameState.board, 2)) {
+    if (
+      !findRecursive(this.gameState.board, 1) &&
+      !findRecursive(this.gameState.board, 2)
+    ) {
       return;
     } else {
       this.getMovesPoints(this.gameState);
       // Here find the best move in this.movesPoints
       // And set this.move with that move
       let bestPositions = searchHigherPositions(this.movesPoints);
-      let position = bestPositions[parseInt(Math.random() * this.gameState.board.length)];
+      let position = bestPositions[parseInt(Math.random() * bestPositions.length)];
       this.move.x = position.x;
       this.move.y = position.y;
     }
@@ -50,7 +53,6 @@ let IA = function(player, gameState) {
     // Permet de connaitre le meilleur mouvement de l'ennemi pour pouvoir le bloquer
     gameState.play(opponentNum, x, y);
     points += gameState.getScore(opponentNum);
-
     return points;
   };
 };
