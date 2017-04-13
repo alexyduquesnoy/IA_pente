@@ -10,7 +10,7 @@ let GameState = function() {
   this.nbTenaille = [0,0];
   this.lastMoveX = 0;
   this.lastMoveY = 0;
-  this.turn = 2;
+  this.turn = 1;
 
   this.play = function(playerNum, x, y) {
     this.lastMoveX = x;
@@ -18,11 +18,6 @@ let GameState = function() {
     this.board[x][y] = playerNum;
     this.checkTenaille();
     this.turn = +playerNum;
-  }
-
-  this.getScore = function(playerNum) {
-    // TODO : add more critera
-    return this.nbTenaille[playerNum - 1] + (this.checkFinalState() === playerNum);
   }
 
   this.getEmptyCells = function() {
@@ -36,7 +31,6 @@ let GameState = function() {
     }
     return emptyCells;
   }
-
 
   // OPTIMIZE : trop de condition ! gérer ça avec deux directions peux (x : [-1, 1], y: [-1, 1]), divise le nombre de condition par 2 ou 4
   this.checkFinalState = function () {
@@ -90,8 +84,6 @@ let GameState = function() {
     let i = this.lastMoveX;
     let j = this.lastMoveY;
     let B = this.board;
-
-    console.log('X : ' + i + '; Y : ' + j);
 
     if(B[i] && B[i][j]) {
       if (
