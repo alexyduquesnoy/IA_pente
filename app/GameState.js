@@ -25,7 +25,7 @@ let GameState = function() {
     let points = this.nbTenaille[playerNum - 1] * 75;
     points += (this.checkFinalState() === playerNum) * 500;
 
-    point += this.getPiecesInARowScore(playerNum, this.lastMoveX, this.lastMoveY);
+    points += this.getPiecesInARowScore(playerNum, this.lastMoveX, this.lastMoveY);
 
     return points;
   }
