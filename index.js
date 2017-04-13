@@ -17,6 +17,4 @@ player.num = 1;
 
 let ia = new IA(player, gameState);
 
-console.log(ia.gameState.board);
 ia.run();
-console.log(ia.gameState.board);

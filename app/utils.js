@@ -1,9 +1,8 @@
-if (!Array.prototype.findRecursive) {
-  Array.prototype.findRecursive = function (searchedElement, strict = false) {
+let findRecursive = function (array, searchedElement, strict = false) {
     let find = false;
-    for (let column of this) {
+    for (let column of array) {
       if(column instanceof Array) {
-        find = column.findRecursive(searchedElement);
+        find = findRecursive(column, searchedElement);
         if(find) {
           return true;
         }
@@ -16,5 +15,6 @@ if (!Array.prototype.findRecursive) {
       }
     }
     return false;
-  };
-}
+};
+
+module.exports.findRecursive = findRecursive;

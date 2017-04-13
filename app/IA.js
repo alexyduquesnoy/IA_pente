@@ -1,3 +1,6 @@
+var findRecursive = require('./utils').findRecursive;
+var clone = require('clone');
+
 let IA = function(player, gameState) {
   this.player = player;
   this.gameState = gameState;
@@ -14,8 +17,8 @@ let IA = function(player, gameState) {
 
   // TODO : refactor le nom de la fonction
   this.run = function() {
-    if(!this.gameState.board.findRecursive(1) && !this.gameState.board.findRecursive(2)) {
-      let boardMiddle = parseInt(his.gameState.board.length / 2);
+    if(!findRecursive(this.gameState.board,1) && !findRecursive(this.gameState.board, 2)) {
+      let boardMiddle = parseInt(this.gameState.board.length / 2);
       this.move.x = boardMiddle;
       this.move.y = boardMiddle;
     } else {
@@ -28,21 +31,20 @@ let IA = function(player, gameState) {
   this.getMovesPoints = function() {
     let emptyCells = this.gameState.getEmptyCells();
     for(let i = 0; i < emptyCells.length; i++) {
-      let x = 5;// emptyCells[i][0];
-      let y = 9;// emptyCells[i][1];
+      let x = emptyCells[i][0];
+      let y = emptyCells[i][1];
       this.movesPoints[x][y] = this.predictScore(this.gameState, x, y);
     }
-    console.log(this.movesPoints);
   };
 
   this.predictScore = function(currentGameState, x, y, points = 0) {
-    let gameState = Object.assign({}, currentGameState);
+    let gameState = clone(currentGameState);
     let opponentNum = this.player.num === 1 ? 2 : 1;
 
     gameState.play(gameState.turn, x, y);
 
     points += gameState.getScore(this.player.num);
-    points -= gameState.getScore(opponentNum);
+    points += gameState.getScore(opponentNum);
 
     return points;
   };
