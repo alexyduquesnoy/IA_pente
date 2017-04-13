@@ -1,6 +1,12 @@
 let IA = function(player, gameState) {
   this.player = player;
   this.gameState = gameState;
+  this.movesPoints = new Array(19);
+
+  for(let i = 0; i < this.movesPoints.length; i++) {
+    this.movesPoints[i] = new Array(19).fill(0);
+  }
+
   this.move = {
     x: 0,
     y: 0
@@ -13,35 +19,30 @@ let IA = function(player, gameState) {
       this.move.x = boardMiddle;
       this.move.y = boardMiddle;
     } else {
-      this.findBestMove();
+      this.getMovesPoints();
+      // Here find the best move in this.movesPoints
+      // And set this.move with that move
     }
   };
 
-  // TODO : refactor le nom de la fonction
-  this.findBestMove = function() {
-    let movesPoint = new Array(19);
-    for(let i = 0; i < movesPoint.length; i++) {
-      movesPoint[i] = new Array(19).fill(0);
-    }
+  this.getMovesPoints = function() {
     let emptyCells = this.gameState.getEmptyCells();
     for(let i = 0; i < emptyCells.length; i++) {
-      let x = emptyCells[i][0];
-      let y = emptyCells[i][1];
-      movesPoint[x][y] = this.getGameStateValue(this.gameState, x, y);
+      let x = 5;// emptyCells[i][0];
+      let y = 9;// emptyCells[i][1];
+      this.movesPoints[x][y] = this.predictScore(this.gameState, x, y);
     }
-
-    console.log(movesPoint);
+    console.log(this.movesPoints);
   };
 
-  this.getGameStateValue = function(currentGameState, x, y) {
-    let points = 0;
-    let gameState = currentGameState;
-    gameState.addMove(player.num, x, y);
-    points += gameState.nbTenaille[this.player.num] * 5 + (gameState.checkFinalState == this.player.num ? 100 : 0);
+  this.predictScore = function(currentGameState, x, y, points = 0) {
+    let gameState = Object.assign({}, currentGameState);
+    let opponentNum = this.player.num === 1 ? 2 : 1;
 
-    let opponentNum = (player.num - 1) * -1 + 1;
-    gameState.addMove(opponentNum, x, y);
-    points -= gameState.nbTenaille[opponentNum] * 5 + (gameState.checkFinalState == opponentNum ? 100 : 0);
+    gameState.play(gameState.turn, x, y);
+
+    points += gameState.getScore(this.player.num);
+    points -= gameState.getScore(opponentNum);
 
     return points;
   };

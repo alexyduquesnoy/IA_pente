@@ -10,16 +10,19 @@ let GameState = function() {
   this.nbTenaille = [0,0];
   this.lastMoveX = 0;
   this.lastMoveY = 0;
+  this.turn = 2;
 
-  this.addMove = function(playerNum, x, y) {
+  this.play = function(playerNum, x, y) {
     this.lastMoveX = x;
     this.lastMoveY = y;
     this.board[x][y] = playerNum;
-    this.checkTenailles();
+    this.checkTenaille();
+    this.turn = +playerNum;
   }
 
-  this.getScore = function(playerNum, weight) {
-    return (this.nbTenaille[this.player.num] * 1 * weight + (this.checkFinalState == this.player.num ? 100 * weight : 0));
+  this.getScore = function(playerNum) {
+    // TODO : add more critera
+    return this.nbTenaille[playerNum - 1] + (this.checkFinalState() === playerNum);
   }
 
   this.getEmptyCells = function() {
@@ -61,49 +64,48 @@ let GameState = function() {
     return 0;
   };
 
-  this.checkTenailles = function () {
+  this.checkTenaille = function () {
     let i = this.lastMoveX;
     let j = this.lastMoveY;
     let B = this.board;
 
-    if (B[i][j] !== 0 && B[i][j + 1] !== 0 && B[i][j] === B[i][j + 3] && B[i][j] !== B[i][j + 1] && B[i][j + 2] === B[i][j + 1]) {
-      this.nbTenaille[B[i][j] - 1]++;
+    if (B[i][j] && B[i][j + 1] && B[i][j + 2] && B[i][j + 3] && B[i][j] !== 0 && B[i][j + 1] !== 0 && B[i][j] === B[i][j + 3] && B[i][j] !== B[i][j + 1] && B[i][j + 2] === B[i][j + 1]) {
+      this.gameState.nbTenaille[B[i][j] - 1]++;
       this.board[i][j + 1] = 0;
       this.board[i][j + 2] = 0;
     }
-    if (B[i][j] !== 0 && B[i + 1][j] !== 0 && B[i][j] === B[i + 3][j] && B[i][j] !== B[i + 1][j] && B[i + 2][j] === B[i + 1][j]) {
-      this.nbTenaille[B[i][j] - 1]++;
+    if (B[i][j] && B[i + 1][j] && B[i + 2][j] && B[i + 3][j] && B[i][j] !== 0 && B[i + 1][j] !== 0 && B[i][j] === B[i + 3][j] && B[i][j] !== B[i + 1][j] && B[i + 2][j] === B[i + 1][j]) {
+      this.gameState.nbTenaille[B[i][j] - 1]++;
       this.board[i + 1][j] = 0;
       this.board[i + 2][j] = 0;
     }
-    if (B[i][j] !== 0 && B[i + 1][j + 1] !== 0 && B[i][j] === B[i + 3][j + 3] && B[i][j] !== B[i + 1][j + 1] && B[i + 2][j + 2] === B[i + 1][j + 1]) {
-      this.nbTenaille[B[i][j] - 1]++;
+    if (B[i][j] && B[i + 1][j + 1] && B[i + 2][j + 2] && B[i + 3][j + 3] && B[i][j] !== 0 && B[i + 1][j + 1] !== 0 && B[i][j] === B[i + 3][j + 3] && B[i][j] !== B[i + 1][j + 1] && B[i + 2][j + 2] === B[i + 1][j + 1]) {
+      this.gameState.nbTenaille[B[i][j] - 1]++;
       this.board[i + 1][j + 1] = 0;
       this.board[i + 2][j + 2] = 0;
     }
-    if (B[i][j] !== 0 && B[i + 1][j - 1] !== 0 && B[i][j] === B[i + 3][j - 3] && B[i][j] !== B[i + 1][j - 1] && B[i + 2][j - 2] === B[i + 1][j - 1]) {
-      this.nbTenaille[B[i][j] - 1]++;
+    if (B[i][j] && B[i + 1][j - 1] && B[i + 2][j - 2] && B[i + 3][j - 3] && B[i][j] !== 0 && B[i + 1][j - 1] !== 0 && B[i][j] === B[i + 3][j - 3] && B[i][j] !== B[i + 1][j - 1] && B[i + 2][j - 2] === B[i + 1][j - 1]) {
+      this.gameState.nbTenaille[B[i][j] - 1]++;
       this.board[i + 1][j - 1] = 0;
       this.board[i + 2][j - 2] = 0;
     }
-    if (B[i][j] !== 0 && B[i][j - 1] !== 0 && B[i][j] === B[i][j - 3] && B[i][j] !== B[i][j - 1] && B[i][j - 2] === B[i][j - 1]) {
-      this.nbTenaille[B[i][j] - 1]++;
+    if (B[i][j] && B[i][j - 1] && B[i][j - 2] && B[i][j - 3] && B[i][j] !== 0 && B[i][j - 1] !== 0 && B[i][j] === B[i][j - 3] && B[i][j] !== B[i][j - 1] && B[i][j - 2] === B[i][j - 1]) {
+      this.gameState.nbTenaille[B[i][j] - 1]++;
       this.board[i][j - 1] = 0;
       this.board[i][j - 2] = 0;
     }
-
-    if (B[i][j] !== 0 && B[i - 1][j] !== 0 && B[i][j] === B[i - 3][j] && B[i][j] !== B[i - 1][j] && B[i - 2][j] === B[i - 1][j]) {
-      this.nbTenaille[B[i][j] - 1]++;
+    if (B[i][j] && B[i - 1][j] && B[i - 2][j] && B[i - 3][j] && B[i][j] !== 0 && B[i - 1][j] !== 0 && B[i][j] === B[i - 3][j] && B[i][j] !== B[i - 1][j] && B[i - 2][j] === B[i - 1][j]) {
+      this.gameState.nbTenaille[B[i][j] - 1]++;
       this.board[i - 1][j] = 0;
       this.board[i - 2][j] = 0;
     }
-    if (B[i][j] !== 0 && B[i - 1][j - 1] !== 0 && B[i][j] === B[i - 3][j - 3] && B[i][j] !== B[i - 1][j - 1] && B[i - 2][j - 2] === B[i - 1][j - 1]) {
-      this.nbTenaille[B[i][j] - 1]++;
+    if (B[i][j] && B[i - 1][j - 1] && B[i - 2][j - 2] && B[i - 3][j - 3] && B[i][j] !== 0 && B[i - 1][j - 1] !== 0 && B[i][j] === B[i - 3][j - 3] && B[i][j] !== B[i - 1][j - 1] && B[i - 2][j - 2] === B[i - 1][j - 1]) {
+      this.gameState.nbTenaille[B[i][j] - 1]++;
       this.board[i - 1][j - 1] = 0;
       this.board[i - 2][j - 2] = 0;
     }
-    if (B[i][j] !== 0 && B[i - 1][j + 1] !== 0 && B[i][j] === B[i - 3][j + 3] && B[i][j] !== B[i - 1][j + 1] && B[i - 2][j + 2] === B[i - 1][j + 1]) {
-      this.nbTenaille[B[i][j] - 1]++;
+    if (B[i][j] && B[i - 1][j + 1] && B[i - 2][j + 2] && B[i - 3][j + 3] && B[i][j] !== 0 && B[i - 1][j + 1] !== 0 && B[i][j] === B[i - 3][j + 3] && B[i][j] !== B[i - 1][j + 1] && B[i - 2][j + 2] === B[i - 1][j + 1]) {
+      this.gameState.nbTenaille[B[i][j] - 1]++;
       this.board[i - 1][j + 1] = 0;
       this.board[i - 2][j + 2] = 0;
     }

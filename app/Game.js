@@ -19,7 +19,6 @@ let Game = function(gameServer) {
   };
 
   this.play = function(data) {
-
     let ia = new IA(this.gameState);
     ia.getBestMove();
     ia.move.x;
