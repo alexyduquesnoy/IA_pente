@@ -1,48 +1,70 @@
-let GameState = require('./GameState');
-let Player = require('./Player');
-let IA = require('./IA');
+var GameState = require('./GameState');
+var Player = require('./Player');
+var IA = require('./IA');
 
-let Game = function(gameServer) {
+var Game = function(gameServer) {
   this.player = new Player("0003arra");
   this.gameServer = gameServer;
   this.gameState = new GameState();
 
   this.start = function() {
-    gameServer.webservices.connect({groupName: this.player.name}, this.connect);
+    var callback = this.connect.bind(null, this);
+    gameServer.webservices.connect({groupName: this.player.name}, callback);
   };
 
-  this.connect = function(data) {
-    // FIXME : this = requestResponse et pas Game !
-    this.player.id = data.idJoueur;
-    this.player.num = data.numJoueur;
-
-    gameServer.webservices.turn({idJoueur: this.player.id}, this.turn);
+  this.connect = function(game, data) {
+    data = JSON.parse(data);
+    if(data.idJoueur) {
+      game.player.id = data.idJoueur;
+      game.player.num = data.numJoueur;
+      var callback = game.turn.bind(null, game);
+      gameServer.webservices.turn({idJoueur: game.player.id}, callback);
+    } else {
+      setTimeout(() => game.start, 500);
+    }
   };
 
   this.play = function(data) {
-    let ia = new IA(this.gameState);
+    var ia = new IA(this.player, this.gameState);
     ia.run();
-
-    gameServer.webservices.play({x: ia.move.x, y: ia.move.y, idJoueur: this.player.id}, this.turn);
+    //console.log(` X : ${ia.move.x}, Y : ${ia.move.y}`);
+    var callback = this.playCallback.bind(null, this);
+    gameServer.webservices.play({x: ia.move.x, y: ia.move.y, idJoueur: this.player.id}, callback);
   };
 
-  this.turn = function(data) {
-    this.update(data);
+  this.playCallback = function(game, data) {
+    setTimeout(function() {
+      var callback = game.turn.bind(null, game);
+      gameServer.webservices.turn({idJoueur: game.player.id}, callback);
+    }, 3000);
+  }
 
+  this.turn = function(game, data) {
+    try {
+      data = JSON.parse(data);
+      game.update(data);
+    } catch (e) {
+      console.log(e);
+      data = {};
+    }
     if(parseInt(data.status) == 1) {
-      this.play();
+      game.play();
     } else {
       setTimeout(function() {
-        gameServer.webservices.turn({idJoueur: this.player.id}, this.turn);
-      }, 500);
+        console.log('test');
+        var callback = game.turn.bind(null, game);
+        gameServer.webservices.turn({idJoueur: game.player.id}, callback);
+      }, 3000);
     }
   };
 
   this.update = function(data) {
+    this.gameState.board = data.tableau;
+    this.gameState.turn = data.status == 1 ? this.player.num : 1 + !(this.player.num - 1);
     this.gameState.nbTenaille[0] = parseInt(data.nbTenaillesJ1);
     this.gameState.nbTenaille[1] = parseInt(data.nbTenaillesJ2);
-    this.gameState.lastMoveX = parseInt(data.dernierCoupX);
-    this.gameState.lastMoveY = parseInt(data.dernierCoupY);
+    this.gameState.lastMoveX = data.dernierCoupX? parseInt(data.dernierCoupX) : null;
+    this.gameState.lastMoveY = data.dernierCoupY? parseInt(data.dernierCoupY) : null;
     this.gameState.numRound = parseInt(data.numTour);
   };
 };

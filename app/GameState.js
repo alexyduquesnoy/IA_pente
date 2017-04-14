@@ -1,28 +1,30 @@
-let GameState = function() {
+var GameState = function() {
   // this.board est un tableau à 2 dimension de 19x19 rempli de 0
   this.board = new Array(19);
-  for(let i = 0; i < this.board.length; i++) {
+  for(var i = 0; i < this.board.length; i++) {
     this.board[i] = new Array(19).fill(0);
   }
 
   // this.gameState = null;
   this.numRound = 0;
   this.nbTenaille = [0,0];
-  this.lastMoveX = 0;
-  this.lastMoveY = 0;
+  this.lastMoveX = null;
+  this.lastMoveY = null;
   this.turn = 1;
+  this.nbTurn = 0;
 
   this.play = function(playerNum, x, y) {
     this.lastMoveX = x;
     this.lastMoveY = y;
     this.board[x][y] = playerNum;
-    this.nbTenaille[playerNum - 1] += this.checkTenailles(x, y);
+    this.nbTenaille[playerNum] += this.checkTenailles(x, y);
     this.turn = playerNum === 1 ? 2 : 1;
   }
 
   this.getScore = function(playerNum) {
     // TODO : add more critera
-    let points = this.nbTenaille[playerNum - 1] * 75;
+    var points = this.nbTenaille[playerNum - 1] * 250;
+
     points += (this.checkFinalState() === playerNum) * 500;
 
     points += this.getPiecesInARowScore(playerNum, this.lastMoveX, this.lastMoveY);
@@ -31,9 +33,9 @@ let GameState = function() {
   }
 
   this.getEmptyCells = function() {
-    let emptyCells = [];
-    for(let x = 0; x < this.board.length; x++) {
-      for(let y = 0; y < this.board[x].length; y++) {
+    var emptyCells = [];
+    for(var x = 0; x < this.board.length; x++) {
+      for(var y = 0; y < this.board[x].length; y++) {
         if(!this.board[x][y]) {
           emptyCells.push([x, y]);
         }
@@ -44,9 +46,9 @@ let GameState = function() {
 
   // OPTIMIZE : trop de condition ! gérer ça avec deux directions peux (x : [-1, 1], y: [-1, 1]), divise le nombre de condition par 2 ou 4
   this.checkFinalState = function () {
-    let B = this.board;
-    for (let playerID = 0; playerID < 2; playerID++) {
-      if (this.nbTenaille[playerID] === 5) {
+    var B = this.board;
+    for (var playerNum = 0; playerNum < 2; playerNum++) {
+      if (this.nbTenaille[playerNum] === 5) {
         return playerID;
       }
     }
@@ -82,7 +84,7 @@ let GameState = function() {
       return false;
     }
 
-    for(let i = 0; i < 4; i++) {
+    for(var i = 0; i < 4; i++) {
       if(
         !this.board[x + (i * xD)] ||
         !this.board[x + (i * xD)][y + (i * yD)]
@@ -105,8 +107,8 @@ let GameState = function() {
 
   // OPTIMIZE : trop de condition ! gérer ça avec deux directions peux (x : [-1, 1], y: [-1, 1]), divise le nombre de condition par 2 ou 4
   this.checkTenailles = function (x, y) {
-    for(let xDirection = -1; xDirection < 2; xDirection++) {
-      for(let yDirection = -1; yDirection < 2; yDirection++) {
+    for(var xDirection = -1; xDirection < 2; xDirection++) {
+      for(var yDirection = -1; yDirection < 2; yDirection++) {
         if(this.checkTenaille(x, y, xDirection, yDirection)) {
           return true;
         }
@@ -136,17 +138,17 @@ let GameState = function() {
   };
 
   this.getPiecesInARow = function (value, x, y) {
-    let scoreMatrix = [];
+    var scoreMatrix = [];
 
     // xD  = xDirection
     // yD = yDirection
-    for(let xD = -1; xD < 2; xD++) {
-      for(let yD = -1; yD < 2; yD++) {
+    for(var xD = -1; xD < 2; xD++) {
+      for(var yD = -1; yD < 2; yD++) {
         if(!scoreMatrix[xD + 1]) {
           scoreMatrix[xD + 1] = [];
         }
         scoreMatrix[xD + 1][yD + 1] = this.getNbPiecesInARow(value, x, y, xD, yD);
-        if (scoreMatrix[xD + 1][yD + 1] > 0) console.log("X : " + x  + "; Y : " + y + "; Score : " + scoreMatrix[xD + 1][yD + 1]);
+        // if (scoreMatrix[xD + 1][yD + 1] > 0) console.log("X : " + x  + "; Y : " + y + "; Score : " + scoreMatrix[xD + 1][yD + 1]);
       }
     }
 
@@ -155,11 +157,11 @@ let GameState = function() {
 
   // Valeur maximum : 160
   this.getPiecesInARowScore = function (value, x, y) {
-    let piecesInARow = this.getPiecesInARow(value, x, y);
-    let score = 0;
+    var piecesInARow = this.getPiecesInARow(value, x, y);
+    var score = 0;
 
-    for(let i = 0; i < piecesInARow.length; i++) {
-      for(let j = 0; j < piecesInARow[i].length; j++) {
+    for(var i = 0; i < piecesInARow.length; i++) {
+      for(var j = 0; j < piecesInARow[i].length; j++) {
         score += Math.exp(piecesInARow[i][j]);
       }
     }

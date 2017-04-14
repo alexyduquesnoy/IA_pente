@@ -1,6 +1,6 @@
-let findRecursive = function (array, searchedElement, strict = false) {
-    let find = false;
-    for (let column of array) {
+var findRecursive = function (array, searchedElement, strict = false) {
+    var find = false;
+    for (var column of array) {
       if(column instanceof Array) {
         find = findRecursive(column, searchedElement);
         if(find) {
@@ -17,10 +17,10 @@ let findRecursive = function (array, searchedElement, strict = false) {
     return false;
 };
 
-let searchHigherPositions = function (board) {
+var searchHigherPositions = function (board) {
   var maxRow = [];
   for (var i = 0; i < board.length; i++) {
-      for (var j = 0; j++ < board[i].length; j++) {
+      for (var j = 0; j < board[i].length; j++) {
           maxRow.push(Math.max(...board[i]));
       }
   }
@@ -36,7 +36,7 @@ let searchHigherPositions = function (board) {
   return position;
 };
 
-let reduceRecursive = (array) => array.reduce(
+var reduceRecursive = (array) => array.reduce(
   (a, b) => a.concat(
     Array.isArray(b) ? b.reduceRecursive() : b
   ),

@@ -1,11 +1,11 @@
-var http = require('http');
+var http = require('https');
 var clone = require('clone');
 
 var gameServer = {
   options : {
-    hostname : '172.20.10.4',
-    port: 3000,
-    path: '/api',
+    hostname : 'workshop.wisak.eu',
+    port: 443,
+    path: '',
     method: 'GET'
   },
   webservices : {
@@ -16,20 +16,24 @@ var gameServer = {
     },
     play: function(args, callback) {
       var options  = clone(gameServer.options);
-      options.path += `/play/${x}/${y}/${idJoueur}`;
+      options.path += `/play/${args.x}/${args.y}/${args.idJoueur}`;
       this.consume(options, callback);
     },
     turn: function(args, callback) {
       var options  = clone(gameServer.options);
-      options.path += `/turn/${idJoueur}`;
+      options.path += `/turn/${args.idJoueur}`;
       this.consume(options, callback);
     },
     consume: function(options, callback) {
       console.log(`Try connection to the game server on : ${options.hostname+options.path}.`);
-      var request  = http.request(options, function(response) {
+      var buffer = '';
+      var request  = http.request(options, (response) => {
         console.log(`Connection to the game server on : ${options.hostname+options.path}, done.`);
         response.setEncoding('utf8');
-        response.on('data', callback);
+        response.on('data', (data) => {
+          buffer += data;
+        });
+        response.on('end', () => { callback(buffer); });
       });
       request.on('error', this.events.error);
       request.end();
