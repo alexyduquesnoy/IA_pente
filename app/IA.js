@@ -24,17 +24,15 @@ var IA = function(player, gameState) {
       this.move.y = (this.gameState.board.length / 2)|0;
     } else if (this.player.first)  {
       this.player.first = false;
-      this.move.y =  (this.gameState.board.length / 2)|0 + 3;
-      this.move.x = (this.gameState.board.length / 2)|0 + 3;
+      this.move.y =  (this.gameState.board.length / 2)|0 + 4;
+      this.move.x = (this.gameState.board.length / 2)|0 + 4;
     } else {
       this.getMovesPoints(this.gameState);
       // Here find the best move in this.movesPoints
       // And set this.move with that move
       // console.log(this.movesPoints);
-
       var bestPositions = searchHigherPositions(this.movesPoints);
-      console.log(bestPositions);
-      var position = bestPositions[parseInt(Math.random() * bestPositions.length)];
+      var position = bestPositions[parseInt(Math.random() * (bestPositions.length>1? bestPositions.length -1 : 0))];
       this.move.x = position.x;
       this.move.y = position.y;
     }

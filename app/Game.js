@@ -14,6 +14,7 @@ var Game = function(gameServer) {
 
   this.connect = function(game, data) {
     data = JSON.parse(data);
+    console.log(data);
     if(data.idJoueur) {
       game.player.id = data.idJoueur;
       game.player.num = data.numJoueur;
@@ -27,7 +28,6 @@ var Game = function(gameServer) {
   this.play = function(data) {
     var ia = new IA(this.player, this.gameState);
     ia.run();
-    //console.log(` X : ${ia.move.x}, Y : ${ia.move.y}`);
     var callback = this.playCallback.bind(null, this);
     gameServer.webservices.play({x: ia.move.x, y: ia.move.y, idJoueur: this.player.id}, callback);
   };

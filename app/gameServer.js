@@ -1,11 +1,13 @@
-var http = require('https');
+var http = require('http');
 var clone = require('clone');
 
 var gameServer = {
   options : {
-    hostname : 'workshop.wisak.eu',
-    port: 443,
-    path: '',
+    hostname : 'reggaeshark.eu',
+    //hostname : 'www.nargilcorp.fr',
+    port: 3000,
+    //port: 80,
+    path: '/api',
     method: 'GET'
   },
   webservices : {

@@ -17,20 +17,20 @@ var GameState = function() {
     this.lastMoveX = x;
     this.lastMoveY = y;
     this.board[x][y] = playerNum;
-    this.nbTenaille[playerNum] += this.checkTenailles(x, y);
+    this.nbTenaille[playerNum - 1] += this.checkTenailles(x, y);
     this.turn = playerNum === 1 ? 2 : 1;
-  }
+  };
 
   this.getScore = function(playerNum) {
     // TODO : add more critera
-    var points = this.nbTenaille[playerNum - 1] * 250;
+    var points = this.nbTenaille[playerNum - 1] * 400;
 
-    points += (this.checkFinalState() === playerNum) * 500;
+    points += (this.checkFinalState() === playerNum) * 800;
 
     points += this.getPiecesInARowScore(playerNum, this.lastMoveX, this.lastMoveY);
 
     return points;
-  }
+  };
 
   this.getEmptyCells = function() {
     var emptyCells = [];
@@ -42,7 +42,7 @@ var GameState = function() {
       }
     }
     return emptyCells;
-  }
+  };
 
   // OPTIMIZE : trop de condition ! gérer ça avec deux directions peux (x : [-1, 1], y: [-1, 1]), divise le nombre de condition par 2 ou 4
   this.checkFinalState = function () {
@@ -80,7 +80,7 @@ var GameState = function() {
     // xD  = xDirection
     // yD = yDirection
 
-    if((xD == 0 && yD == 0) || !this.board[x] || !this.board[x][y]) {
+    if((xD === 0 && yD === 0) || !this.board[x] || !this.board[x][y]) {
       return false;
     }
 
@@ -102,7 +102,7 @@ var GameState = function() {
     }
 
     return false;
-  }
+  };
 
 
   // OPTIMIZE : trop de condition ! gérer ça avec deux directions peux (x : [-1, 1], y: [-1, 1]), divise le nombre de condition par 2 ou 4
@@ -148,7 +148,6 @@ var GameState = function() {
           scoreMatrix[xD + 1] = [];
         }
         scoreMatrix[xD + 1][yD + 1] = this.getNbPiecesInARow(value, x, y, xD, yD);
-        // if (scoreMatrix[xD + 1][yD + 1] > 0) console.log("X : " + x  + "; Y : " + y + "; Score : " + scoreMatrix[xD + 1][yD + 1]);
       }
     }
 
